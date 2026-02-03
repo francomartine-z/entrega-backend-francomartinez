@@ -24,10 +24,9 @@ app.get('/', (req, res) => {
 
 //endpoint para obtener un producto por su id
 app.get('/api/products/:pid',async (req, res) => { //convertimos la funcion en asincrona
-  const pid = req.params.pid; //obtiene el parametro de la url "pid"
-
-  lista = await products.getProducts(); // esperamos a que se carguen los archivos de getProducts 
-  const product = products.find(p => p.id == pid); //busca un objeto que coincida con el id
+  const pid = req.params.pid; //obtiene el parametro de la url "pid".
+  const lista = await products.getProducts(); // esperamos a que se carguen los archivos de getProducts 
+  const product = lista.find(p => p.id == pid); //busca un objeto de la lista que coincida con el id
   if (product) {
     res.json({ status: 'success', data: product });
   } else {
@@ -35,48 +34,49 @@ app.get('/api/products/:pid',async (req, res) => { //convertimos la funcion en a
   }
 })
 
-app.post('/api/products', (req, res) => {
-   const { title, description, code, price, status, stock, category, thumbnails } = req.body;
-   const id = products.length + 1;
-   products.push(
-    {
-        id,
-        title,
-        description,
-        code,
-        price,
-        status,
-        stock,
-        category,
-        thumbnails
+app.post('/api/products', async (req, res) => {
+    try{
+        const productData = req.body //todos los datos que envia el usuario
+        await products.createProducts(productData) //crea el producto en base a los datos enviados
+        const lista = await products.getProducts(); //Obtenemos la lista actualizada
+        res.json ({ status: 'success', message: 'Productos cargados' , data : lista })
+    } catch {
+        res.status(500).json({ status: 'error', message:'Error al enviar los archivos' })
     }
-   );
-   res.json({ status: 'success', message: 'Producto agregado', data: products });       
 });
 
-app.put('/api/products/:pid', (req, res) => {
-   const pid = Number(req.params.pid); 
-   const index = products.findIndex(p => p.id === pid)
+app.put('/api/products/:pid', async (req, res) => {
+    const pid = (req.params.pid); 
+    const lista = await products.getProducts(); //lee el producto
+    const index = lista.findIndex(p => p.id === pid) // busca el producto que coincida con el pid:, si no lo encuentra devuelve -1
+    
+   //si el index es igual a -1 devuelve "producto no encontrado"
    if (index === -1){
     return res.status(404).json({
         status : 'error',
         message : 'Producto no encontrado'
     })
    }
-   products[index] ={
+
+   // sobre escribe todo el body del producto sin tocar el id
+   lista[index] ={
     ...products[index],
     ...req.body,
-    id : products[index].id
+    id : lista[index].id
    }
 
-   res.json({ status: 'success', message: 'Producto Actualizado', data: products[index] });       
+   await products.saveProducts(lista)
+
+   res.json({ status: 'success', message: 'Producto Actualizado', data: lista[index] });       
 });
 
-app.delete('/api/products/:pid', (req, res) => {
+app.delete('/api/products/:pid', async(req, res) => {
    const pid = req.params.pid; 
-   const index = products.findIndex(p => p.id == pid);
+   const prod = await products.getProducts();
+   const index = prod.findIndex(p => p.id === pid);
    if (index !== -1) {
-    products.splice(index, 1);
+    prod.splice(index, 1);
+    await products.saveProducts(prod);
     res.json({ status: 'success', message: 'Producto eliminado', data: products });
    } else {
     res.status(404).json({ status: 'error', message: 'Producto no encontrado' });

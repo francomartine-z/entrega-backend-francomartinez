@@ -1,15 +1,16 @@
 [
   {
-    "id": "bd4fdb5b-4ff6-4be8-bb84-82c18d670728",
-    "title": "ad",
-    "description": "adf",
-    "code": "jodjod",
-    "price": 3232,
+    "title": "prod-1",
+    "description": "Prod de prueba",
+    "code": "554kl",
+    "price": 100,
     "status": true,
-    "stock": 10,
-    "category": "cat-1",
+    "stock": 20,
+    "categoria": "cat-2",
     "thumbnails": [
-      "imagen.png"
-    ]
+      "imagen1.png",
+      "imagen2.png"
+    ],
+    "id": "6681036f-25ac-4287-b14d-96369ba45959"
   }
 ]

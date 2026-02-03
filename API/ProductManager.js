@@ -41,19 +41,13 @@ class ProductsManager{
         }
     } 
     
+    async saveProducts(lista){ // Sobre escribe el json sin agregar otro objeto al array
+        const text = JSON.stringify(lista, null, 2);
+        await fs.writeFile(path, text);
+    }
 }
 
 const manager= new ProductsManager()
 
-manager.createProducts({
-    title: 'ad',
-    description : "adf",
-    code: 'jodjod',
-    price: 3232,
-    status: true,
-    stock: 10,
-    category: 'cat-1',
-    thumbnails: ['imagen.png']
-})
 
 export default ProductsManager
