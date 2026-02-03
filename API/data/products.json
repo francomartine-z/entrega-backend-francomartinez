@@ -1,16 +1,5 @@
 [
   {
-    "title": "prod-1",
-    "description": "Prod de prueba",
-    "code": "554kl",
-    "price": 100,
-    "status": true,
-    "stock": 20,
-    "categoria": "cat-2",
-    "thumbnails": [
-      "imagen1.png",
-      "imagen2.png"
-    ],
-    "id": "6681036f-25ac-4287-b14d-96369ba45959"
+    "id": "fea96bc9-a686-475b-9e45-1c4df0e91088"
   }
 ]

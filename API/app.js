@@ -1,5 +1,6 @@
 import express from 'express';
 import ProductsManager from './productManager.js';
+import CartManager from './CartManager.js';
 
 const app = express();
 app.use(express.json());
@@ -7,7 +8,7 @@ const PORT = 8080;
 
 const products = new ProductsManager;
 
-const carts = [];
+const carts = new CartManager;
 
 //pagina principal
 app.get('/', (req, res) => {
@@ -34,6 +35,8 @@ app.get('/api/products/:pid',async (req, res) => { //convertimos la funcion en a
   }
 })
 
+
+//endpoint para agregar un producto a products
 app.post('/api/products', async (req, res) => {
     try{
         const productData = req.body //todos los datos que envia el usuario
@@ -45,6 +48,7 @@ app.post('/api/products', async (req, res) => {
     }
 });
 
+//endpoint para sobreescribir el producto
 app.put('/api/products/:pid', async (req, res) => {
     const pid = (req.params.pid); 
     const lista = await products.getProducts(); //lee el producto
@@ -65,18 +69,20 @@ app.put('/api/products/:pid', async (req, res) => {
     id : lista[index].id
    }
 
-   await products.saveProducts(lista)
+   await products.saveProducts(lista) //guarda los cambios en el json
 
    res.json({ status: 'success', message: 'Producto Actualizado', data: lista[index] });       
 });
 
+
+//endpoint para eliminar productos 
 app.delete('/api/products/:pid', async(req, res) => {
    const pid = req.params.pid; 
-   const prod = await products.getProducts();
-   const index = prod.findIndex(p => p.id === pid);
-   if (index !== -1) {
-    prod.splice(index, 1);
-    await products.saveProducts(prod);
+   const prod = await products.getProducts(); //carga los productos
+   const index = prod.findIndex(p => p.id === pid); // verifica que el producto del id exista sino devuelve -1
+   if (index !== -1) { // si la respuesta es diferente a -1
+    prod.splice(index, 1); //elimina el producto
+    await products.saveProducts(prod); // guarda los datos en el json
     res.json({ status: 'success', message: 'Producto eliminado', data: products });
    } else {
     res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
@@ -85,29 +91,31 @@ app.delete('/api/products/:pid', async(req, res) => {
 
 //CARRITO
 
-app.get('/api/carts', (req, res) => {
-  if (carts.length === 0) {
+app.get('/api/carts', async (req, res) => {
+    const lista = await carts.getProducts();
+  if (lista.length === 0) {
     res.json({ status: 'success', message: 'No hay carritos disponibles' });
   } else {
-    res.json({ status: 'success', data: carts})
+    res.json({ status: 'success', data: lista})
   }
 })
 
-app.post('/api/carts', (req, res) => {
-    const cid = carts.length + 1;
-    carts.push(
-        {
-            id: cid,
-            products: [] 
-        }
-    );
-    res.json({ status: 'success', message: 'Carrito creado', data: carts }); 
+app.post('/api/carts', async(req, res) => {
+    try{
+        const cartsData = req.body;
+        await carts.createCart(cartsData); //Crea el carrito
+        const lista = await carts.getProducts(); // carga los carritos
+        res.json ({ status: 'success', message: 'Productos cargados' , data : lista })
+    } catch {
+        res.status(500).json({ status: 'error', message:'Error al enviar los archivos' })
+    }
 });
           
 
-app.get('/api/carts/:cid', (req, res) => {
+app.get('/api/carts/:cid', async (req, res) => {
   const cid = req.params.cid;
-  const cart = carts.find(c => c.id == cid);
+  const lista = await carts.getProducts(); //carga los carritos
+  const cart = lista.find(c => c.id == cid); //busca un objeto que coincida con el  id
   if (cart) {
     res.json({ status: 'success', data: cart });
   } else {
@@ -115,13 +123,15 @@ app.get('/api/carts/:cid', (req, res) => {
   }
 });
 
-app.post('/api/carts/:cid/products/:pid', (req, res) => {
+app.post('/api/carts/:cid/products/:pid', async(req, res) => {
     const {quantity = 1} = req.body; // cantidad por defecto 1
     const cid = req.params.cid; // id del carrito
     const pid = req.params.pid; // id del producto
-    const cart = carts.find(c => c.id == cid); // busco el carrito por id
+    const cartsList = await carts.getProducts(); //carga los carritos
+    const cart = cartsList.find(c => c.id == cid); // busco el carrito por id
     if (cart) {// si el carrito existe
-    const product = products.find(p => p.id == pid); // busco el producto por id
+    const prod = await products.getProducts()
+    const product = prod.find(p => p.id == pid); // busco el producto por id
     if (product) {// si el producto existe
       const productInCart = cart.products.find(p => p.product == pid); // busco el producto en el carrito
       if (productInCart) {
