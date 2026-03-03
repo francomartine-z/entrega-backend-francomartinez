@@ -1,5 +1,36 @@
 [
   {
     "id": "fea96bc9-a686-475b-9e45-1c4df0e91088"
+  },
+  {
+    "id": "6118576c-21d3-4642-87a9-48ff55797f6c",
+    "title": "prod-1",
+    "code": "123abc",
+    "price": "100",
+    "status": "nuevp",
+    "stock": "10",
+    "category": "B",
+    "thumbnails": "[img-1]",
+    "desctiption": "descrip prod-1"
+  },
+  {
+    "id": "109e3082-69ee-4542-aef3-50758bf9f022",
+    "title": "prod-2",
+    "code": "123pbc",
+    "price": "100",
+    "status": "nuevo",
+    "stock": "12",
+    "category": "B",
+    "thumbnails": "[img-1]"
+  },
+  {
+    "id": "59fbae57-097e-49ad-aa48-5d386534ce23",
+    "title": "prod-4",
+    "code": "124dbc",
+    "price": "500",
+    "status": "nuevo",
+    "stock": "22",
+    "category": "A",
+    "thumbnails": "[img-2]"
   }
 ]

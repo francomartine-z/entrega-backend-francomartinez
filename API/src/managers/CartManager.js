@@ -22,7 +22,7 @@ class CartManager{
         await fs.writeFile(path, text); //agrega el text a la ruta del json
     }
 
-    async getProducts(){
+    async getCarts(){
         try{
             const data= await fs.readFile(path, 'utf-8'); //lee el archivo y lo devuelve
             this.lista= JSON.parse(data); // parsea la data para que se pueda usar en formato js
@@ -32,7 +32,7 @@ class CartManager{
         }
     } 
         
-    async saveProducts(lista){ // Sobre escribe el json sin agregar otro objeto al array
+    async saveCarts(lista){ // Sobre escribe el json sin agregar otro objeto al array
         const text = JSON.stringify(lista, null, 2);
         await fs.writeFile(path, text);
     }
