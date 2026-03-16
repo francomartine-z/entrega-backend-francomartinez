@@ -8,6 +8,12 @@ import viewsRouter from './routes/views.router.js'; //importamos el router de vi
 import http from 'http';
 import { Server } from 'socket.io';
 import ProductsManager from './managers/ProductManager.js';
+import mongoose from 'mongoose';
+
+// Conexión a MongoDB
+mongoose.connect("mongodb+srv://franco200494_db_user:franco1994@cluster0.hhe7gmk.mongodb.net/?appName=Cluster0")
+  .then(() => console.log("Conectado a MongoDB"))
+  .catch((error) => console.error("Error al conectar a MongoDB:", error));
 
 const products = new ProductsManager();
 const app = express(); // Configuración de app con express
