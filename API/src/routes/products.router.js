@@ -1,8 +1,6 @@
 import { Router } from "express";
-import ProductsManager from '../managers/ProductManager.js';
 import ProductModel from "../models/products.model.js";
 
-const products = new ProductsManager;
 const router = Router();
 
 //PRODUCTOS
@@ -66,7 +64,11 @@ router.get('/:pid',async (req, res) => { //convertimos la funcion en asincrona
     payload: product
   });
  } catch (error) {
-  res.status(500).json({ status: 'error', message: 'Error al obtener el producto' }); //si hay un error al obtener el producto, se devuelve una respuesta con estado 500 y un mensaje de error
+  console.error("ERROR REAL:", error); // 🔥 importante
+  res.status(500).json({
+    status: 'error',
+    error: error.message
+  });
 }
 })
 
@@ -142,4 +144,3 @@ router.delete('/:pid', async(req, res) => {
 
 
 export default router
-

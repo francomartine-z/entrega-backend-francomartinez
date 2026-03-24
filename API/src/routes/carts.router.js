@@ -1,12 +1,8 @@
 import { Router} from "express";
-import CartManager from '../managers/CartManager.js';
-import ProductsManager from '../managers/ProductManager.js';
 import CartModel from "../models/carts.model.js";
 import ProductModel from "../models/products.model.js";
 
 const router = Router();
-const carts = new CartManager;
-const products = new ProductsManager;
 
 //CARRITO
 
@@ -70,7 +66,7 @@ router.get('/:cid', async (req, res) => {
 });
 
 //endpoint para agregar un producto a un carrito
-router.post('/:cid/product/:pid', async(req, res) => {
+router.post('/:cid/products/:pid', async(req, res) => {
     try {
         const { cid, pid } = req.params; // obtiene el id del carrito y el id del producto de los parametros de la url
         
@@ -122,40 +118,7 @@ router.post('/:cid/product/:pid', async(req, res) => {
       }
     });
 
-
-router.put('/:cid', async (req, res) => {
-  try{
-    const { cid, pid } = req.params;
-    const { products } = req.body; //obtiene el array de productos actualizado del cuerpo de la solicitud
-
-    const cart = await CartModel.findById(cid);
-
-    if (!cart) {
-      return res.status(404).send({
-        status: "error",
-        error: "Carrito no encontrado"
-      });
-    }
-
-    // reemplazar todo el carrito
-    cart.products = products; //reemplaza el array de productos del carrito con el nuevo array de productos recibido en el cuerpo de la solicitud
-
-    await cart.save();
-
-    res.send({
-      status: "success",
-      message: "Carrito actualizado.",
-      payload: cart
-    });
-  } catch (error) {
-    res.status(500).send({
-      status: "error",
-      error: "Error al actualizar el carrito"
-    });
-  }
-});
-
-router.put('/:cid/product/:pid', async (req, res) => {
+router.put('/:cid/products/:pid', async (req, res) => {
   try {
     const { cid, pid } = req.params;
     const { quantity } = req.body; //obtiene la cantidad actualizada del producto del cuerpo de la solicitud
@@ -198,8 +161,70 @@ router.put('/:cid/product/:pid', async (req, res) => {
   }
 });
 
+router.put("/:cid", async (req, res) => {
+  try {
+    const { cid } = req.params;
+    const { products } = req.body; //obtiene el array de productos actualizado del cuerpo de la solicitud
+
+    const cart = await CartModel.findById(cid);
+
+    if (!cart) {
+      return res.status(404).send({
+        status: "error",
+        error: "Carrito no encontrado"
+      });
+    }
+
+    // Reemplazar todo el carrito
+    cart.products = products;
+
+    await cart.save();
+
+    res.send({
+      status: "success",
+      message: "Carrito actualizado.",
+      payload: cart
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      error: "Error al actualizar el carrito"
+    });
+  }
+})
+
+router.delete('/:cid', async (req, res) => {
+  try{
+    const { cid } = req.params;
+
+    const cart = await CartModel.findById(cid);
+
+    if (!cart) {
+      return res.status(404).send({
+        status: "error",
+        error: "Carrito no encontrado"
+      });
+    }
+
+    cart.products = []; //vacía el array de productos del carrito para eliminar todos los productos del carrito
+    
+    await cart.save();
+
+    res.send({
+      status: "success",
+      message: "Carrito vaciado.",
+      payload: cart
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: "error",
+      error: "Error al vaciar el carrito"
+    });
+  }
+});
+
 //endpoint para eliminar un producto de un carrito
-router.delete("/:cid/product/:pid", async (req, res) => {
+router.delete("/:cid/products/:pid", async (req, res) => {
       try {
         const { cid, pid } = req.params;
         
@@ -220,7 +245,7 @@ router.delete("/:cid/product/:pid", async (req, res) => {
         await cart.save(); //guarda los cambios
 
         res.send({
-          status: "succes",
+          status: "success",
           message: "Producto eliminado del carrito",
           payload: cart
         });  
